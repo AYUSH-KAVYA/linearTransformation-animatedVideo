@@ -190,3 +190,123 @@ class ConceptIntroScene(Scene):
             FadeOut(scaled_u), FadeOut(scaled_lbl),
             run_time=0.8,
         )  # ~34s in scene
+
+        # ── 3. GEOMETRIC SIGNATURE: LINEAR VS NONLINEAR (0:38 – 0:50) ──────
+        geo_rule = Text(
+            "Geometrically, a transformation is linear iff:",
+            font_size=28,
+            weight=BOLD,
+            color=COLOR_TEXT,
+        ).move_to(UP * 2.25)
+        geo_sub = Text(
+            "1. The origin stays fixed     •     2. Grid lines remain parallel & evenly spaced",
+            font_size=22,
+            color=COLOR_ACCENT,
+        ).next_to(geo_rule, DOWN, buff=0.22)
+
+        # Side-by-side comparison grids
+        g_lin = NumberPlane(
+            x_range=(-3, 3, 1), y_range=(-3, 3, 1), x_length=3.8, y_length=3.2,
+            background_line_style={"stroke_color": COLOR_I, "stroke_width": 1.6, "stroke_opacity": 0.75},
+            axis_config={"stroke_color": COLOR_TEXT, "stroke_width": 1.8},
+        ).move_to(LEFT * 3.1 + DOWN * 0.45)
+        lin_origin = g_lin.c2p(0, 0)
+        lin_dot = Dot(lin_origin, color=COLOR_V, radius=0.07)
+        lin_lbl = Text("✓ Linear (parallel & straight)", font_size=21, weight=BOLD, color=COLOR_I)
+        lin_lbl.next_to(g_lin, DOWN, buff=0.28)
+
+        g_non = NumberPlane(
+            x_range=(-3, 3, 1), y_range=(-3, 3, 1), x_length=3.8, y_length=3.2,
+            background_line_style={"stroke_color": COLOR_NEG, "stroke_width": 1.6, "stroke_opacity": 0.75},
+            axis_config={"stroke_color": COLOR_TEXT, "stroke_width": 1.8},
+        ).move_to(RIGHT * 3.1 + DOWN * 0.45)
+        non_origin = g_non.c2p(0, 0)
+        non_dot = Dot(non_origin, color=COLOR_V, radius=0.07)
+        non_lbl = Text("✗ Nonlinear (curved grid lines)", font_size=21, weight=BOLD, color=COLOR_NEG)
+        non_lbl.next_to(g_non, DOWN, buff=0.28)
+
+        self.play(Write(geo_rule), FadeIn(geo_sub), run_time=1.3)
+        self.play(Create(g_lin), Create(g_non), FadeIn(lin_dot), FadeIn(non_dot), run_time=1.2)
+
+        def nonlinear_warp(p):
+            rel = p - non_origin
+            x, y = rel[0], rel[1]
+            return non_origin + np.array([x + 0.16 * (y ** 2), y + 0.25 * np.sin(1.4 * x), 0.0])
+
+        self.play(
+            ApplyMatrix(np.array([[1.0, 0.55], [0.25, 0.9]]), g_lin, about_point=lin_origin),
+            ApplyPointwiseFunction(nonlinear_warp, g_non),
+            run_time=2.5,
+        )
+        self.play(FadeIn(lin_lbl), FadeIn(non_lbl), run_time=0.8)
+        self.wait(4.8)
+
+        self.play(
+            FadeOut(geo_rule), FadeOut(geo_sub),
+            FadeOut(g_lin), FadeOut(g_non),
+            FadeOut(lin_dot), FadeOut(non_dot),
+            FadeOut(lin_lbl), FadeOut(non_lbl),
+            run_time=0.7,
+        )
+
+        # ── 4. DERIVE THE 2x2 MATRIX REPRESENTATION (0:50 – 1:03) ──────────
+        der_title = Text(
+            "Why Every Linear Map in ℝ² Is a 2 × 2 Matrix",
+            font_size=30,
+            weight=BOLD,
+            color=COLOR_ACCENT,
+        ).move_to(UP * 2.15)
+
+        step_a = MathTex(
+            r"\mathbf{x} = \begin{bmatrix} x \\ y \end{bmatrix} = x\,\hat{\imath} + y\,\hat{\jmath}",
+            font_size=34,
+        ).move_to(UP * 1.15)
+
+        step_b = MathTex(
+            r"T(\mathbf{x}) = T(x\,\hat{\imath} + y\,\hat{\jmath}) = x\,T(\hat{\imath}) + y\,T(\hat{\jmath})",
+            font_size=34,
+        ).next_to(step_a, DOWN, buff=0.42)
+
+        step_c = MathTex(
+            r"\text{If } T(\hat{\imath}) = \begin{bmatrix} a \\ c \end{bmatrix} \text{ and } "
+            r"T(\hat{\jmath}) = \begin{bmatrix} b \\ d \end{bmatrix}, \text{ then:}",
+            font_size=30,
+            color=COLOR_MUTED,
+        ).next_to(step_b, DOWN, buff=0.45)
+
+        mat_final = VGroup(
+            MathTex(r"T(\mathbf{x}) = ", font_size=38),
+            color_coded_matrix(0, 0, 0, 0, font_size=38),  # placeholder overwritten below
+        )
+        final_eq = MathTex(
+            r"T(\mathbf{x}) = A\mathbf{x} = ",
+            r"\begin{bmatrix}",
+            "a", "&", "b", r"\\",
+            "c", "&", "d",
+            r"\end{bmatrix}",
+            r"\begin{bmatrix} x \\ y \end{bmatrix}",
+            font_size=38,
+        )
+        final_eq[2].set_color(COLOR_I)
+        final_eq[6].set_color(COLOR_I)
+        final_eq[4].set_color(COLOR_J)
+        final_eq[8].set_color(COLOR_J)
+        final_card = make_card(final_eq, border_color=COLOR_ACCENT, pad=0.28).next_to(step_c, DOWN, buff=0.4)
+
+        col_legend = VGroup(
+            Text("Column 1 = where î lands", font_size=22, weight=BOLD, color=COLOR_I),
+            Text("•", font_size=22, color=COLOR_MUTED),
+            Text("Column 2 = where ĵ lands", font_size=22, weight=BOLD, color=COLOR_J),
+        ).arrange(RIGHT, buff=0.35).next_to(final_card, DOWN, buff=0.32)
+
+        self.play(Write(der_title), run_time=1.0)
+        self.play(Write(step_a), run_time=1.4)
+        self.wait(1.3)
+        self.play(Write(step_b), run_time=1.6)
+        self.wait(1.6)
+        self.play(Write(step_c), run_time=1.2)
+        self.play(FadeIn(final_card, shift=UP * 0.2), run_time=1.5)
+        self.play(FadeIn(col_legend, shift=UP * 0.15), run_time=1.0)
+        self.wait(5.2)
+
+        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
