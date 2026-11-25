@@ -76,3 +76,56 @@ class SummaryScene(Scene):
 
         self.wait(2.4)
         self.play(FadeOut(header), FadeOut(cards), run_time=0.8)  # ~21s
+
+        # ── 2. CLOSING FRAME: REFERENCES, CREDITS & AI DISCLOSURE (0:18 – 0:32)
+        c_header = make_header("Credits, References & Disclosure", "Closing Frame")
+        self.play(FadeIn(c_header, shift=DOWN * 0.15), run_time=0.8)
+
+        refs_title = Text("References & Tools", font_size=22, weight=BOLD, color=COLOR_ACCENT)
+        refs_body = Text(
+            "• 3Blue1Brown (Grant Sanderson) — Essence of Linear Algebra\n"
+            "• Gilbert Strang — Introduction to Linear Algebra (MIT / Wellesley-Cambridge)\n"
+            "• Animation Engine: Manim Community Edition v0.22 (Python + LaTeX)\n"
+            "• Presenter & Voice Narration: " + f"{STUDENT_NAME} ({STUDENT_ID})",
+            font_size=19,
+            color=COLOR_TEXT,
+            line_spacing=1.35,
+        )
+        refs_card = make_card(
+            VGroup(refs_title, refs_body).arrange(DOWN, aligned_edge=LEFT, buff=0.18),
+            border_color=COLOR_ACCENT,
+            pad=0.26,
+        )
+
+        ai_title = Text("Audio & AI Tool Disclosure", font_size=22, weight=BOLD, color=COLOR_V)
+        ai_body = Text(
+            "• Voice-over narration recorded directly by the student; optional background\n"
+            "  music (if added) kept low-volume and credited in repository README.\n"
+            "• AI Disclosure: Antigravity AI assisted with Manim scene scripting and\n"
+            "  storyboard drafting. All mathematical derivations and code were verified.",
+            font_size=19,
+            color=COLOR_MUTED,
+            line_spacing=1.35,
+        )
+        ai_card = make_card(
+            VGroup(ai_title, ai_body).arrange(DOWN, aligned_edge=LEFT, buff=0.18),
+            border_color=CARD_BORDER,
+            pad=0.26,
+        )
+
+        closing_stack = VGroup(refs_card, ai_card).arrange(DOWN, buff=0.35).move_to(UP * 0.1)
+        thanks = Text(
+            f"Thank You for Watching!   •   {COURSE_TITLE}",
+            font_size=24,
+            weight=BOLD,
+            color=COLOR_ACCENT,
+        ).next_to(closing_stack, DOWN, buff=0.45)
+
+        self.play(FadeIn(refs_card, shift=UP * 0.2), run_time=1.2)
+        self.wait(2.5)
+        self.play(FadeIn(ai_card, shift=UP * 0.2), run_time=1.2)
+        self.wait(2.5)
+        self.play(Write(thanks), run_time=1.1)
+        self.wait(4.5)
+
+        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
