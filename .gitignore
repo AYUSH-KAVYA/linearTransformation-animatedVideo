@@ -1,0 +1,7 @@
+# Virtual environment & build artifacts
+.venv/
+__pycache__/
+*.pyc
+media/
+LinearTransformations_Preview.mp4
+.DS_Store
