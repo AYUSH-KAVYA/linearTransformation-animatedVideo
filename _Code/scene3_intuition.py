@@ -143,6 +143,32 @@ class VisualIntuitionScene(Scene):
                 ],
                 "v_out": "(1, 1)  →  (2, 1)",
             },
+            {
+                "name": "3. Horizontal Shear",
+                "matrix": np.array([[1.0, 1.0], [0.0, 1.0]]),
+                "rot_angle": None,
+                "accent": COLOR_I,
+                "effects": [
+                    "• Lengths: î stays fixed; ĵ stretches",
+                    "• Parallel horizontal lines slide",
+                    "• Area: Scale factor det = +1 (unchanged!)",
+                    "• Orientation: Preserved (CCW)",
+                ],
+                "v_out": "(1, 1)  →  (2, 1)",
+            },
+            {
+                "name": "4. Reflection (y-axis)",
+                "matrix": np.array([[-1.0, 0.0], [0.0, 1.0]]),
+                "rot_angle": None,
+                "accent": COLOR_NEG,
+                "effects": [
+                    "• Lengths: Preserved (mirror symmetry)",
+                    "• Direction: î flips to (-1, 0)",
+                    "• Area: |det| = |-1| = 1 (unchanged)",
+                    "• Orientation: FLIPPED (CCW → CW!)",
+                ],
+                "v_out": "(1, 1)  →  (-1, 1)",
+            },
         ]
 
         for idx, d in enumerate(demos):
