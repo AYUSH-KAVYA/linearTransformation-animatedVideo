@@ -140,3 +140,93 @@ class HookScene(Scene):
             FadeOut(mat_badge),
             run_time=0.8,
         )  # Total so far: ~22.5s
+
+        # ── 3. GUIDING QUESTION & TEASER (0:24 – 0:44) ─────────────────────
+        q_title = Text("The Central Question", font_size=26, weight=BOLD, color=COLOR_ACCENT)
+        q_body = Text(
+            "What happens to all of 2D space when we\nmultiply every vector by a 2 × 2 matrix?",
+            font_size=34,
+            weight=BOLD,
+            color=COLOR_TEXT,
+            line_spacing=1.35,
+        )
+        q_group = VGroup(q_title, q_body).arrange(DOWN, buff=0.35).move_to(UP * 0.3)
+
+        self.play(FadeIn(q_title), Write(q_body), run_time=2.2)
+        self.wait(2.5)
+        self.play(FadeOut(q_group), run_time=0.7)
+
+        # Full-plane teaser with matrix A = [[1.5, 0.8], [-0.3, 1.2]]
+        ghost2, active2, origin2 = make_plane_pair(
+            x_range=(-5, 5, 1),
+            y_range=(-3, 3, 1),
+            unit_size=0.82,
+            center=DOWN * 0.15,
+            show_numbers=True,
+        )
+
+        alpha = ValueTracker(0.0)
+        mat_start = np.eye(2)
+        mat_end = np.array([[1.5, 0.8], [-0.3, 1.2]])
+
+        unit_sq = always_redraw(lambda: Polygon(
+            *[
+                ghost2.c2p(*interp_matrix(mat_start, mat_end, alpha.get_value()) @ p)
+                for p in [(0, 0), (1, 0), (1, 1), (0, 1)]
+            ],
+            stroke_color=COLOR_AREA_OUT,
+            stroke_width=2.5,
+            fill_color=COLOR_AREA if alpha.get_value() < 0.5 else COLOR_AREA_OUT,
+            fill_opacity=0.28,
+        ))
+        i_vec = always_redraw(lambda: vec_arrow(
+            ghost2,
+            interp_matrix(mat_start, mat_end, alpha.get_value()) @ np.array([1.0, 0.0]),
+            COLOR_I,
+        ))
+        j_vec = always_redraw(lambda: vec_arrow(
+            ghost2,
+            interp_matrix(mat_start, mat_end, alpha.get_value()) @ np.array([0.0, 1.0]),
+            COLOR_J,
+        ))
+        i_lbl = always_redraw(lambda: place_tip_label(
+            MathTex(r"\hat{\imath}", font_size=30, color=COLOR_I),
+            ghost2,
+            interp_matrix(mat_start, mat_end, alpha.get_value()) @ np.array([1.0, 0.0]),
+            offset_scale=0.35,
+        ))
+        j_lbl = always_redraw(lambda: place_tip_label(
+            MathTex(r"\hat{\jmath}", font_size=30, color=COLOR_J),
+            ghost2,
+            interp_matrix(mat_start, mat_end, alpha.get_value()) @ np.array([0.0, 1.0]),
+            offset_scale=0.35,
+        ))
+
+        teaser_mat = VGroup(
+            MathTex(r"A = ", font_size=34, color=COLOR_TEXT),
+            color_coded_matrix(1.5, 0.8, -0.3, 1.2, font_size=34),
+        ).arrange(RIGHT, buff=0.15)
+        teaser_card = make_card(teaser_mat, border_color=COLOR_ACCENT, pad=0.2).to_corner(UL, buff=0.4)
+
+        self.play(Create(ghost2), Create(active2), FadeIn(teaser_card), run_time=1.4)
+        self.play(Create(unit_sq), GrowArrow(i_vec), GrowArrow(j_vec), FadeIn(i_lbl), FadeIn(j_lbl), run_time=1.0)
+        self.wait(1.2)
+
+        self.play(
+            ApplyMatrix(mat_end, active2, about_point=origin2),
+            alpha.animate.set_value(1.0),
+            run_time=3.2,
+        )
+        self.wait(2.2)
+
+        bridge = Text(
+            "Let's uncover how four numbers encode this entire motion.",
+            font_size=26,
+            weight=BOLD,
+            color=COLOR_ACCENT,
+        )
+        bridge_card = make_card(bridge, border_color=COLOR_ACCENT, pad=0.22).to_edge(DOWN, buff=0.32)
+        self.play(FadeIn(bridge_card, shift=UP * 0.2), run_time=1.0)
+        self.wait(3.2)
+
+        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
