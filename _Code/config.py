@@ -9,8 +9,8 @@ from manim import *
 COURSE_TITLE = "Linear Algebra and Calculus (M3) • Internal Assessment"
 VIDEO_TITLE = "Linear Transformations"
 VIDEO_SUBTITLE = "How Matrices Map Vectors, Deform Space & Scale Area"
-STUDENT_NAME = "[Student Name]"
-STUDENT_ID = "[Student ID]"
+STUDENT_NAME = "Ayush Sharma"
+STUDENT_ID = "E25B070912"
 
 # ─── Consistent Color Palette ───
 BG_COLOR = "#0F172A"         # Deep slate-navy background
