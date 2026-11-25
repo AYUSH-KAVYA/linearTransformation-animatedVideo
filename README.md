@@ -8,7 +8,7 @@ A ~5-minute (`04:59.6`, `1920x1080`, `30 fps`) Manim Community Edition animation
 
 | File / Directory | Description |
 |---|---|
-| [`LinearTransformations_Video.mp4`](LinearTransformations_Video.mp4) | Final 1080p 16:9 MP4 animation (`04:59.6`, `~16 MB`). |
+| [`LT-animatedVideo.mp4`](LT-animatedVideo.mp4) | Final 1080p 16:9 MP4 animation with voice-over narration (`04:59.6`, `~20 MB`). |
 | [`_Code/`](_Code/) | Complete modular Manim Python source code (`config.py`, `helpers.py`, `scene1_hook.py` – `scene6_summary.py`, `build_video.py`). |
 | [`Storyboard.pdf`](Storyboard.pdf) | Official 6-scene storyboard PDF + mathematical verification summary. |
 | [`Storyboard.md`](Storyboard.md) | Markdown source for the storyboard. |
