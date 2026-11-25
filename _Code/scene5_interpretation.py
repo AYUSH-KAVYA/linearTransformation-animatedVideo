@@ -190,3 +190,76 @@ class InterpretationScene(Scene):
             FadeOut(sq2), FadeOut(area_lbl2), FadeOut(arc2), FadeOut(i2), FadeOut(j2),
             run_time=0.7,
         )  # ~29.6s
+
+        # ── CASE 3 : det(C) = 0 (SINGULAR COLLAPSE) ────────────────────────
+        ghost3, active3, orig3 = make_plane_pair(
+            x_range=(-2, 4, 1),
+            y_range=(-1, 5, 1),
+            unit_size=0.76,
+            center=RIGHT * 3.15 + DOWN * 0.2,
+            show_numbers=True,
+        )
+        mat_c = np.array([[2.0, 1.0], [4.0, 2.0]])
+        alpha3 = ValueTracker(0.0)
+
+        def cur3():
+            return interp_matrix(np.eye(2), mat_c, alpha3.get_value())
+
+        sq3 = always_redraw(lambda: Polygon(
+            *[ghost3.c2p(*(cur3() @ p)) for p in [(0, 0), (1, 0), (1, 1), (0, 1)]],
+            stroke_color=COLOR_ZERO,
+            stroke_width=2.6,
+            fill_color=COLOR_ZERO,
+            fill_opacity=0.28,
+        ))
+        i3 = always_redraw(lambda: vec_arrow(ghost3, cur3() @ np.array([1.0, 0.0]), COLOR_I))
+        j3 = always_redraw(lambda: vec_arrow(ghost3, cur3() @ np.array([0.0, 1.0]), COLOR_J))
+        i3_lbl = always_redraw(lambda: add_bg_pill(place_tip_label(
+            MathTex(r"C\hat{\imath}=(2,4)" if alpha3.get_value() > 0.7 else r"\hat{\imath}", font_size=18, color=COLOR_I),
+            ghost3, cur3() @ np.array([1.0, 0.0]), 0.36,
+        )))
+        j3_lbl = always_redraw(lambda: add_bg_pill(place_tip_label(
+            MathTex(r"C\hat{\jmath}=(1,2)" if alpha3.get_value() > 0.7 else r"\hat{\jmath}", font_size=18, color=COLOR_J),
+            ghost3, cur3() @ np.array([0.0, 1.0]), 0.36,
+        )))
+
+        c3_title = Text("Case 3: Zero Determinant (det = 0)", font_size=23, weight=BOLD, color=COLOR_ZERO)
+        c3_mat = VGroup(
+            MathTex(r"C = ", font_size=30),
+            color_coded_matrix(2, 1, 4, 2, font_size=30),
+        ).arrange(RIGHT, buff=0.12)
+        c3_calc = MathTex(
+            r"\det(C) = (2)(2) - (1)(4) = 0",
+            font_size=28,
+            color=COLOR_ZERO,
+        )
+        c3_notes = VGroup(
+            Text("• Both columns lie on the same line y = 2x", font_size=20, color=COLOR_TEXT),
+            Text("• The entire 2D plane squishes onto 1D!", font_size=20, color=COLOR_ZERO),
+            Text("• Area → 0, information lost (singular!)", font_size=20, color=COLOR_MUTED),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.18)
+
+        c3_card = make_card(
+            VGroup(c3_title, c3_mat, c3_calc, c3_notes).arrange(DOWN, aligned_edge=LEFT, buff=0.28),
+            border_color=COLOR_ZERO,
+            pad=0.26,
+        ).move_to(LEFT * 3.45 + DOWN * 0.1)
+
+        self.play(FadeIn(c3_card, shift=RIGHT * 0.2), Create(ghost3), Create(active3), run_time=1.2)
+        self.play(Create(sq3), GrowArrow(i3), GrowArrow(j3), FadeIn(i3_lbl), FadeIn(j3_lbl), run_time=1.0)
+        self.wait(2.0)
+
+        self.play(
+            ApplyMatrix(mat_c, active3, about_point=orig3),
+            alpha3.animate.set_value(1.0),
+            run_time=3.2,
+        )
+        line_badge = make_card(
+            MathTex(r"\text{Image}(C) : y = 2x \quad (\text{Area} = 0)", font_size=23, color=COLOR_ZERO),
+            border_color=COLOR_ZERO,
+            pad=0.16,
+        ).next_to(c3_card, DOWN, buff=0.28)
+        self.play(FadeIn(line_badge, shift=UP * 0.15), run_time=0.9)
+        self.wait(6.0)
+
+        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
